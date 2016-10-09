@@ -16,6 +16,7 @@ public class EditActivity extends AppCompatActivity {
 
         EditText etUpdatedItem = (EditText) findViewById(R.id.updateText);
         etUpdatedItem.setText(getIntent().getStringExtra("itemText"));
+        etUpdatedItem.setSelection(getIntent().getStringExtra("itemText").length());
     }
 
     public void onUpdateItem(View v) {
