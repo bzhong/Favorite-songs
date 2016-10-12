@@ -5,19 +5,16 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import org.apache.commons.io.FileUtils;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    ArrayList<TodoItem> items;
+    TodoItemAdapter itemsAdapter;
     ListView lvItems;
 
     private final int REQUEST_CODE = 20;
@@ -27,28 +24,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        lvItems = (ListView) findViewById(R.id.lvItems);
+        // Construct the data source
         readItems();
-        itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        // Create the adapter to convert the array to views
+        itemsAdapter = new TodoItemAdapter(this, items);
+        // Attach the adapter to a ListView
+        lvItems = (ListView) findViewById(R.id.lvItems);
         lvItems.setAdapter(itemsAdapter);
+
         setupListViewListener();
     }
 
     public void onAddItem(View v) {
         EditText etNewItem = (EditText) findViewById(R.id.editText);
         String itemText = etNewItem.getText().toString();
-        itemsAdapter.add(itemText);
+
+        writeNewItem(itemText);
         etNewItem.setText("");
-        writeItems();
     }
 
     private void setupListViewListener() {
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
+                items.get(pos).delete();
                 items.remove(pos);
                 itemsAdapter.notifyDataSetChanged();
-                writeItems();
                 return true;
             }
         });
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
                 Intent i = new Intent(MainActivity.this, EditActivity.class);
-                i.putExtra("itemText", items.get(pos));
+                i.putExtra("itemText", items.get(pos).text);
                 i.putExtra("itemIndex", pos);
                 startActivityForResult(i, REQUEST_CODE);
             }
@@ -70,30 +71,39 @@ public class MainActivity extends AppCompatActivity {
             int position = data.getExtras().getInt("itemIndex");
             if (position != -1) {
                 String updatedText = data.getExtras().getString("itemText");
-                items.set(position, updatedText);
-                itemsAdapter.notifyDataSetChanged();
-                writeItems();
+                updateItem(position, updatedText);
             }
         }
     }
 
     private void readItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
-        } catch (IOException e) {
-            items = new ArrayList<String>();
-        }
+        items = (ArrayList) SQLite.select().from(TodoItem.class).queryList();
     }
 
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void writeNewItem(String itemText) {
+        TodoItem newItem = new TodoItem();
+        newItem.id = maxItemId() + 1;
+        newItem.text = itemText;
+        newItem.priority = "High";
+        itemsAdapter.add(newItem);
+        newItem.save();
+    }
+
+    private void updateItem(int pos, String text) {
+        TodoItem oldItem = items.get(pos);
+        oldItem.text = text;
+        oldItem.save();
+        items.set(pos, oldItem);
+        itemsAdapter.notifyDataSetChanged();
+    }
+
+    private int maxItemId() {
+        int maxId = -1;
+        for (TodoItem item: items) {
+            if (item.id > maxId) {
+                maxId = item.id;
+            }
         }
+        return maxId;
     }
 }
