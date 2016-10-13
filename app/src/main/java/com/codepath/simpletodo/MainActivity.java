@@ -1,18 +1,19 @@
 package com.codepath.simpletodo;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+    implements EditTodoItemDialogFragment.EditTodoItemDialogListener {
+
     ArrayList<TodoItem> items;
     TodoItemAdapter itemsAdapter;
     ListView lvItems;
@@ -36,11 +37,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onAddItem(View v) {
-        EditText etNewItem = (EditText) findViewById(R.id.editText);
-        String itemText = etNewItem.getText().toString();
-
-        writeNewItem(itemText);
-        etNewItem.setText("");
+        editTodoItem("Add a todo item", -1);
     }
 
     private void setupListViewListener() {
@@ -57,22 +54,32 @@ public class MainActivity extends AppCompatActivity {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
-                Intent i = new Intent(MainActivity.this, EditActivity.class);
-                i.putExtra("itemText", items.get(pos).text);
-                i.putExtra("itemIndex", pos);
-                startActivityForResult(i, REQUEST_CODE);
+                editTodoItem("Edit a todo item", pos);
             }
         });
     }
 
+    private void editTodoItem(String title, int pos) {
+        FragmentManager fm = getSupportFragmentManager();
+        EditTodoItemDialogFragment editTodoItemDialogFragment =
+                EditTodoItemDialogFragment.newInstance(title);
+        Bundle args = new Bundle();
+        if (pos != -1) {
+            args.putString("itemText", items.get(pos).text);
+        } else {
+            args.putString("itemText", "");
+        }
+        args.putInt("itemIndex", pos);
+        editTodoItemDialogFragment.setArguments(args);
+        editTodoItemDialogFragment.show(fm, "activity_edit");
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-            int position = data.getExtras().getInt("itemIndex");
-            if (position != -1) {
-                String updatedText = data.getExtras().getString("itemText");
-                updateItem(position, updatedText);
-            }
+    public void onFinishEditDialog(String itemText, int pos) {
+        if (pos != -1) {
+            updateItem(pos, itemText);
+        } else {
+            writeNewItem(itemText);
         }
     }
 
@@ -99,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int maxItemId() {
         int maxId = -1;
-        for (TodoItem item: items) {
+        for (TodoItem item : items) {
             if (item.id > maxId) {
                 maxId = item.id;
             }
