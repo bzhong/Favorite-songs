@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity
         Bundle args = new Bundle();
         if (pos != -1) {
             args.putString("itemText", items.get(pos).text);
+            args.putString("priority", items.get(pos).priority);
         } else {
             args.putString("itemText", "");
         }
@@ -75,11 +76,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFinishEditDialog(String itemText, int pos) {
+    public void onFinishEditDialog(String itemText, String priority, int pos) {
         if (pos != -1) {
-            updateItem(pos, itemText);
+            updateItem(pos, itemText, priority);
         } else {
-            writeNewItem(itemText);
+            writeNewItem(itemText, priority);
         }
     }
 
@@ -87,18 +88,19 @@ public class MainActivity extends AppCompatActivity
         items = (ArrayList) SQLite.select().from(TodoItem.class).queryList();
     }
 
-    private void writeNewItem(String itemText) {
+    private void writeNewItem(String itemText, String priority) {
         TodoItem newItem = new TodoItem();
         newItem.id = maxItemId() + 1;
         newItem.text = itemText;
-        newItem.priority = "High";
+        newItem.priority = priority;
         itemsAdapter.add(newItem);
         newItem.save();
     }
 
-    private void updateItem(int pos, String text) {
+    private void updateItem(int pos, String text, String priority) {
         TodoItem oldItem = items.get(pos);
         oldItem.text = text;
+        oldItem.priority = priority;
         oldItem.save();
         items.set(pos, oldItem);
         itemsAdapter.notifyDataSetChanged();

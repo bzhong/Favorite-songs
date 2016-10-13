@@ -37,9 +37,27 @@
         android:layout_height="wrap_content"
         android:id="@+id/save"
         android:onClick="onUpdateItem"
-        android:layout_marginTop="27dp"
-        android:layout_below="@+id/updateText"
+        android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="Priority Level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView2"
+        android:layout_alignTop="@+id/spinner"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textStyle="normal|bold" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner"
+        android:layout_below="@+id/updateText"
+        android:layout_toRightOf="@+id/save"
+        android:layout_toEndOf="@+id/save"
+        android:layout_marginTop="50dp" />
 
 </RelativeLayout>

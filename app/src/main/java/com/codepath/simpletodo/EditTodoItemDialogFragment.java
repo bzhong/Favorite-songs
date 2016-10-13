@@ -6,12 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 public class EditTodoItemDialogFragment extends DialogFragment {
 
     private EditText mEditText;
+    private String mPriority;
+    private Spinner mSpinner;
+    private ArrayAdapter<CharSequence> spinnerAdapter;
 
     public EditTodoItemDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -51,7 +57,34 @@ public class EditTodoItemDialogFragment extends DialogFragment {
 
         // Get field from view
         mEditText = (EditText) view.findViewById(R.id.updateText);
+        bindSpinner(view);
         displayTextIfExist();
+
+    }
+
+    private void bindSpinner(View view) {
+        mSpinner = (Spinner) view.findViewById(R.id.spinner);
+        spinnerAdapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.priorities, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        mSpinner.setAdapter(spinnerAdapter);
+        String existingPriority = getArguments().getString("priority");
+        if (existingPriority != null) {
+            mPriority = existingPriority;
+            mSpinner.setSelection(spinnerAdapter.getPosition(mPriority));
+        }
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id) {
+                mPriority = parent.getItemAtPosition(pos).toString();
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+        });
     }
 
     private void displayTextIfExist() {
@@ -75,13 +108,16 @@ public class EditTodoItemDialogFragment extends DialogFragment {
     }
 
     public interface EditTodoItemDialogListener {
-        void onFinishEditDialog(String inputText, int pos);
+        void onFinishEditDialog(String inputText, String priority, int pos);
     }
 
     public void onUpdateItem(View v) {
         // Return input text back to activity through the implemented listener
         EditTodoItemDialogListener listener = (EditTodoItemDialogListener) getActivity();
-        listener.onFinishEditDialog(mEditText.getText().toString(), getArguments().getInt("itemIndex"));
+        listener.onFinishEditDialog(
+            mEditText.getText().toString(),
+            mPriority,
+            getArguments().getInt("itemIndex"));
         // Close the dialog and return back to the parent activity
         dismiss();
     }
