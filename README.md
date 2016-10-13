@@ -27,6 +27,6 @@ The following **optional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='favorite_songs.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='favorite_todo_app.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
