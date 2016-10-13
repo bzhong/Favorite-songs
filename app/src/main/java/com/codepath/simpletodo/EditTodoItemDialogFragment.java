@@ -9,6 +9,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -18,6 +19,9 @@ public class EditTodoItemDialogFragment extends DialogFragment {
     private String mPriority;
     private Spinner mSpinner;
     private ArrayAdapter<CharSequence> spinnerAdapter;
+    private int mYear;
+    private int mMonth;
+    private int mDay;
 
     public EditTodoItemDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -59,7 +63,28 @@ public class EditTodoItemDialogFragment extends DialogFragment {
         mEditText = (EditText) view.findViewById(R.id.updateText);
         bindSpinner(view);
         displayTextIfExist();
+        setDueDate(view);
+    }
 
+    private void setDueDate(View view) {
+        DatePicker date = (DatePicker) view.findViewById(R.id.datePicker);
+        if (getArguments().getInt("year", -1) != -1) {
+            mYear = getArguments().getInt("year");
+            mMonth = getArguments().getInt("month");
+            mDay = getArguments().getInt("day");
+        } else {
+            mYear = date.getYear();
+            mMonth = date.getMonth();
+            mDay = date.getDayOfMonth();
+        }
+        date.init(mYear, mMonth, mDay, new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker view, int year, int monthOfYear,int dayOfMonth) {
+                mYear = year;
+                mMonth = monthOfYear;
+                mDay = dayOfMonth;
+            };
+        });
     }
 
     private void bindSpinner(View view) {
@@ -108,7 +133,13 @@ public class EditTodoItemDialogFragment extends DialogFragment {
     }
 
     public interface EditTodoItemDialogListener {
-        void onFinishEditDialog(String inputText, String priority, int pos);
+        void onFinishEditDialog(
+            String inputText,
+            String priority,
+            int pos,
+            int year,
+            int month,
+            int day);
     }
 
     public void onUpdateItem(View v) {
@@ -117,7 +148,10 @@ public class EditTodoItemDialogFragment extends DialogFragment {
         listener.onFinishEditDialog(
             mEditText.getText().toString(),
             mPriority,
-            getArguments().getInt("itemIndex"));
+            getArguments().getInt("itemIndex"),
+            mYear,
+            mMonth,
+            mDay);
         // Close the dialog and return back to the parent activity
         dismiss();
     }

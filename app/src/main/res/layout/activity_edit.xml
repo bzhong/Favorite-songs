@@ -20,16 +20,38 @@
         android:id="@+id/textView"
         android:textStyle="normal|bold" />
 
-    <EditText
+    <TextView
+        android:text="Item name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:ems="10"
-        android:layout_below="@+id/textView"
+        android:layout_alignTop="@+id/updateText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="30dp"
-        android:id="@+id/updateText" />
+        android:layout_marginTop="11dp"
+        android:id="@+id/textView4"
+        android:textStyle="normal|bold" />
+
+    <DatePicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:datePickerMode="spinner"
+        android:id="@+id/datePicker"
+        android:calendarViewShown="false"
+        android:layout_below="@+id/updateText"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="22dp" />
+
+    <TextView
+        android:text="Due date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:textStyle="normal|bold"
+        android:layout_alignBottom="@+id/datePicker"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="97dp" />
 
     <Button
         android:text="Save"
@@ -37,27 +59,39 @@
         android:layout_height="wrap_content"
         android:id="@+id/save"
         android:onClick="onUpdateItem"
-        android:layout_centerVertical="true"
+        android:layout_marginBottom="24dp"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:layout_marginTop="20dp"
+        android:id="@+id/updateText"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <TextView
         android:text="Priority Level"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView2"
-        android:layout_alignTop="@+id/spinner"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textStyle="normal|bold" />
+        android:textStyle="normal|bold"
+        android:layout_marginBottom="29dp"
+        android:layout_above="@+id/save"
+        android:layout_alignRight="@+id/save"
+        android:layout_alignEnd="@+id/save" />
 
     <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/spinner"
-        android:layout_below="@+id/updateText"
-        android:layout_toRightOf="@+id/save"
-        android:layout_toEndOf="@+id/save"
-        android:layout_marginTop="50dp" />
+        android:layout_alignTop="@+id/textView2"
+        android:layout_alignLeft="@+id/updateText"
+        android:layout_alignStart="@+id/updateText" />
 
 </RelativeLayout>

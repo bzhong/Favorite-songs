@@ -19,5 +19,11 @@ public class TodoItem extends BaseModel {
     String priority;
 
     @Column
-    String dueDate;
+    int year;
+
+    @Column
+    int month;
+
+    @Column
+    int day;
 }
